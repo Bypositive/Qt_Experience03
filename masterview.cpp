@@ -21,6 +21,7 @@ void MasterView::goLoginView()
     qDebug()<<"goLoginView";
     loginView =new LoginView(this);
     pushWidgetToStackView(loginView);
+    connect(loginView,SIGNAL(loginSuccess()),this,SLOT(goWelcomeView()));
 }
 
 void MasterView::goWelcomeView()
@@ -83,3 +84,10 @@ void MasterView::pushWidgetToStackView(QWidget *widget)
     ui->stackedWidget->setCurrentIndex(count-1);
     ui->labelTitle->setText(widget->windowTitle());
 }
+
+void MasterView::on_btBack_clicked()
+{
+    goPreviousView();
+
+}
+

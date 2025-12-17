@@ -15,6 +15,7 @@ LoginView::~LoginView()
 
 void LoginView::on_pushButton_clicked()
 {
+    emit loginSuccess();
 
 }
 
