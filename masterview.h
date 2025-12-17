@@ -35,6 +35,8 @@ public slots:
     void goPreviousView();
 
 private:
+    void pushWidgetToStackView(QWidget*widget);
+
     Ui::MasterView *ui;
 
     WelcomeView *welcomeView;

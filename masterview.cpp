@@ -20,36 +20,66 @@ void MasterView::goLoginView()
 {
     qDebug()<<"goLoginView";
     loginView =new LoginView(this);
-    ui->stackedWidget->addWidget(loginView);
-
+    pushWidgetToStackView(loginView);
 }
 
 void MasterView::goWelcomeView()
 {
-
+    qDebug()<<"goWelcomeView";
+    welcomeView =new WelcomeView(this);
+    pushWidgetToStackView(welcomeView);
 }
 
 void MasterView::goDoctorView()
 {
+    qDebug()<<"goDoctorView";
+    doctorView =new DoctorView(this);
+    pushWidgetToStackView(doctorView);
 
 }
 
 void MasterView::goDepartmentView()
 {
+    qDebug()<<"goDepartmentView";
+    departmentView =new DepartmentView(this);
+    pushWidgetToStackView(departmentView);
 
 }
 
 void MasterView::goPatientEditView()
 {
+    qDebug()<<"goPatientEditView";
+    patientEditView =new PatientEditView(this);
+    pushWidgetToStackView(patientEditView);
 
 }
 
 void MasterView::goPatientView()
 {
+    qDebug()<<"goPatientView";
+    patienceView =new PatienceView(this);
+    pushWidgetToStackView(patienceView);
 
 }
 
 void MasterView::goPreviousView()
 {
+    int count= ui->stackedWidget->count();
+    if(count>1){
+        ui->stackedWidget->setCurrentIndex(count-2);
+        ui->labelTitle->setText(ui->stackedWidget->currentWidget()->windowTitle());
 
+        QWidget *widget=ui->stackedWidget->widget(count-1);
+        ui->stackedWidget->removeWidget(widget);
+        delete widget;
+    }
+
+}
+
+void MasterView::pushWidgetToStackView(QWidget *widget)
+{
+    ui->stackedWidget->addWidget(widget);
+    int count =ui->stackedWidget->count();
+    ui->stackedWidget->setCurrentIndex(count-1);
+    ui->labelTitle->setText(widget->windowTitle());
 }
