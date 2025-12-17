@@ -11,15 +11,18 @@ CONFIG += c++17
 SOURCES += \
     loginview.cpp \
     main.cpp \
-    masterview.cpp
+    masterview.cpp \
+    welcomeview.cpp
 
 HEADERS += \
     loginview.h \
-    masterview.h
+    masterview.h \
+    welcomeview.h
 
 FORMS += \
     loginview.ui \
-    masterview.ui
+    masterview.ui \
+    welcomeview.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
