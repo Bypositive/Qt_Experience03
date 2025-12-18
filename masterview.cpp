@@ -85,6 +85,11 @@ void MasterView::goPatientView()
 void MasterView::goHistoryView()
 {
     qDebug() << "goHistoryView";
+    if (historyView) {
+        ui->stackedWidget->removeWidget(historyView);
+        delete historyView;
+        historyView = nullptr;
+    }
     historyView = new HistoryView(this);
     pushWidgetToStackView(historyView);
 }
