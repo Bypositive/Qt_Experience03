@@ -34,8 +34,6 @@ void LoginView::on_pushButton_clicked()
 
     if (result == "loginOk") {
         QMessageBox::information(this, "登录成功", "欢迎使用无极哥医疗诊断系统");
-
-        // 记录登录操作
         IDatabase::getInstance().addOperationRecord("用户登录", QString("用户：%1").arg(username));
 
         emit loginSuccess();

@@ -16,7 +16,7 @@ public:
     }
 
     QString userLogin(QString userName, QString password);
-    QString getCurrentUserName(); // 获取当前登录用户名
+    QString getCurrentUserName();
 
 private:
     void initDatabase();
@@ -24,7 +24,7 @@ private:
     IDatabase(IDatabase const &)=delete;
     void operator=(IDatabase const &)=delete;
     QSqlDatabase database;
-    QString currentUserName; // 当前登录用户名
+    QString currentUserName;
 
 public:
     // 操作记录管理
@@ -51,7 +51,7 @@ public:
 
     QSqlTableModel *doctorTabModel;
     QSqlTableModel *departmentTabModel;
-    QSqlTableModel *historyTabModel; // 操作记录表模型
+    QSqlTableModel *historyTabModel;
     QItemSelectionModel *theDoctorSelection;
     QItemSelectionModel *theDepartmentSelection;
 

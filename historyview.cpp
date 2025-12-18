@@ -16,8 +16,6 @@ HistoryView::HistoryView(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("操作记录");
     initModel();
-
-    // 添加开发者信息
     QLabel *developerLabel = new QLabel("操作记录查看 | 开发者：张三 学号：20230001", this);
     developerLabel->setGeometry(QRect(20, this->height() - 40, 400, 30));
     developerLabel->setStyleSheet("color: gray; font-size: 12px;");
@@ -35,14 +33,10 @@ void HistoryView::initModel()
         ui->tableView->setModel(model);
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-        // 调整列宽
         ui->tableView->setColumnWidth(0, 200);   // 记录ID
         ui->tableView->setColumnWidth(1, 100);   // 操作用户
         ui->tableView->setColumnWidth(2, 300);   // 操作事件
         ui->tableView->setColumnWidth(3, 150);   // 操作时间
-
-        // 隐藏记录ID列（一般用户不需要看）
         ui->tableView->setColumnHidden(0, true);
     } else {
         QMessageBox::warning(this, "错误", "无法初始化操作记录数据模型");
@@ -110,11 +104,7 @@ void HistoryView::on_btExport_clicked()
     }
 
     QTextStream out(&file);
-
-    // 写入表头
     out << "操作用户,操作事件,操作时间\n";
-
-    // 写入数据
     for (int row = 0; row < model->rowCount(); row++) {
         QString userName = model->data(model->index(row, 1)).toString();
         QString event = model->data(model->index(row, 2)).toString();

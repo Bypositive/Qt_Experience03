@@ -30,7 +30,6 @@ void DoctorView::initModel()
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-        // 调整列宽
         ui->tableView->setColumnWidth(1, 100);   // 工号
         ui->tableView->setColumnWidth(2, 120);   // 姓名
         ui->tableView->setColumnWidth(3, 150);   // 科室ID
@@ -81,7 +80,6 @@ void DoctorView::on_btClear_clicked()
 
 void DoctorView::on_btAdd_clicked()
 {
-    // 简单的添加对话框
     bool ok1, ok2, ok3;
     QString employeeNo = QInputDialog::getText(this, "添加医生",
                                                "请输入工号:",
@@ -153,8 +151,6 @@ void DoctorView::on_btEdit_clicked()
     QString currentEmployeeNo = model->data(model->index(row, 1)).toString();
     QString currentName = model->data(model->index(row, 2)).toString();
     QString currentDeptId = model->data(model->index(row, 3)).toString();
-
-    // 创建编辑对话框
     bool ok1, ok2, ok3;
     QString employeeNo = QInputDialog::getText(this, "编辑医生信息",
                                                "工号:",

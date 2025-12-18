@@ -85,17 +85,14 @@ void DepartmentView::on_btClear_clicked()
 
 void DepartmentView::on_btAdd_clicked()
 {
-    // 获取科室ID
     bool okId;
     QString departmentId = QInputDialog::getText(this, "添加科室",
                                                  "请输入科室ID:",
                                                  QLineEdit::Normal, "", &okId);
 
     if (!okId || departmentId.trimmed().isEmpty()) {
-        return; // 用户取消或输入为空
+        return;
     }
-
-    // 检查ID是否已存在
     QSqlQuery query;
     query.prepare("SELECT COUNT(*) FROM Department WHERE ID = :id");
     query.bindValue(":id", departmentId.trimmed());
@@ -195,7 +192,6 @@ void DepartmentView::on_tableView_doubleClicked(const QModelIndex &index)
 }
 void DepartmentView::on_btStats_clicked()
 {
-    // 统计每个科室的医生数量
     QSqlQuery query;
     query.prepare("SELECT d.NAME as 科室名称, COUNT(doc.ID) as 医生数量 "
                   "FROM Department d "

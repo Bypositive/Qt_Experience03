@@ -13,8 +13,6 @@ PatienceView::PatienceView(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("患者管理");
     initModel();
-
-    // 连接按钮信号
     connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
     connect(ui->btHistory, &QPushButton::clicked, this, &PatienceView::on_btHistory_clicked);
 }
@@ -35,13 +33,9 @@ void PatienceView::initModel()
         ui->tableView->setModel(model);
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-        // 隐藏不需要的列
-        ui->tableView->setColumnHidden(0, true);    // 隐藏ID列
-        ui->tableView->setColumnHidden(8, true);    // 隐藏AGE列
-        ui->tableView->setColumnHidden(9, true);    // 隐藏CREATEDTIMESTAMP列
-
-        // 调整列宽
+        ui->tableView->setColumnHidden(0, true);
+        ui->tableView->setColumnHidden(8, true);
+        ui->tableView->setColumnHidden(9, true);
         ui->tableView->setColumnWidth(1, 150);   // 身份证
         ui->tableView->setColumnWidth(2, 100);   // 姓名
         ui->tableView->setColumnWidth(3, 60);    // 性别
@@ -69,17 +63,13 @@ void PatienceView::on_btSearch_clicked()
     qDebug() << "搜索关键词:" << filter;
 
     if (filter.isEmpty()) {
-        // 如果搜索框为空，显示所有患者
         if (IDatabase::getInstance().searchPatient("")) {
             updateTableView();
         }
         return;
     }
-
-    // 判断搜索类型并构建正确的SQL条件
     QString condition;
 
-    // 检查是否是纯数字
     bool isNumber;
     filter.toLongLong(&isNumber);
 
@@ -98,8 +88,6 @@ void PatienceView::on_btSearch_clicked()
     }
 
     qDebug() << "构建的搜索条件:" << condition;
-
-    // 直接SQL查询测试
     QSqlQuery testQuery;
     QString testSql = QString("SELECT COUNT(*) as count FROM Patient WHERE %1").arg(condition);
     qDebug() << "测试SQL:" << testSql;
@@ -117,8 +105,6 @@ void PatienceView::on_btSearch_clicked()
             }
         }
     }
-
-    // 使用QSqlTableModel进行搜索
     if (IDatabase::getInstance().searchPatient(condition)) {
         int rowCount = model->rowCount();
         qDebug() << "QSqlTableModel找到" << rowCount << "条记录";
@@ -126,8 +112,6 @@ void PatienceView::on_btSearch_clicked()
         if (rowCount > 0) {
             QMessageBox::information(this, "查找成功",
                                      QString("找到 %1 条匹配记录").arg(rowCount));
-
-            // 自动选中第一行
             if (rowCount > 0) {
                 ui->tableView->selectRow(0);
             }
@@ -144,14 +128,10 @@ void PatienceView::on_btSearch_clicked()
 }
 void PatienceView::on_btClear_clicked()
 {
-    // 清除搜索框
     ui->txtSearch->clear();
 
-    // 显示所有患者
     IDatabase::getInstance().searchPatient("");
     updateTableView();
-
-    // 清除选择
     ui->tableView->clearSelection();
 }
 
@@ -170,9 +150,9 @@ void PatienceView::on_btDelete_clicked()
     }
 
     int row = currentIndex.row();
-    QString patientName = model->data(model->index(row, 2)).toString(); // NAME在第2列
-    QString patientId = model->data(model->index(row, 0)).toString();   // ID在第0列
-    QString patientCard = model->data(model->index(row, 1)).toString(); // 身份证号
+    QString patientName = model->data(model->index(row, 2)).toString();
+    QString patientId = model->data(model->index(row, 0)).toString();
+    QString patientCard = model->data(model->index(row, 1)).toString();
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "确认删除",
@@ -198,7 +178,7 @@ void PatienceView::on_btEdit_clicked()
     }
 
     int row = currentIndex.row();
-    QString patientId = model->data(model->index(row, 0)).toString(); // ID在第0列
+    QString patientId = model->data(model->index(row, 0)).toString();
     emit editPatientRequested(patientId);
 }
 
@@ -206,7 +186,7 @@ void PatienceView::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
         int row = index.row();
-        QString patientId = model->data(model->index(row, 0)).toString(); // ID在第0列
+        QString patientId = model->data(model->index(row, 0)).toString();
         emit editPatientRequested(patientId);
     }
 }

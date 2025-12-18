@@ -20,7 +20,7 @@ signals:
     void addPatientRequested();
     void editPatientRequested(const QString &patientId);
     void goBack();
-    void showHistoryRequested(); // 新增：显示操作记录信号
+    void showHistoryRequested();
 
 private slots:
     void on_btSearch_clicked();
@@ -28,7 +28,7 @@ private slots:
     void on_btDelete_clicked();
     void on_btClear_clicked();
     void on_btEdit_clicked();
-    void on_btHistory_clicked(); // 新增：操作记录按钮点击
+    void on_btHistory_clicked();
     void on_tableView_doubleClicked(const QModelIndex &index);
 
 private:

@@ -30,32 +30,23 @@ PatientEditView::~PatientEditView()
 
 void PatientEditView::initUI()
 {
-    // 初始化性别下拉框
     ui->sex->addItem("男");
     ui->sex->addItem("女");
-
-    // 初始化出生日期下拉框（默认当前日期）
     QDate currentDate = QDate::currentDate();
     for (int year = 1900; year <= currentDate.year(); year++) {
         ui->birthday->addItem(QString::number(year) + "-01-01");
     }
-    ui->birthday->setEditable(true); // 允许编辑
-
-    // 初始化身高下拉框（单位：cm）
+    ui->birthday->setEditable(true);
     for (int i = 140; i <= 220; i++) {
         ui->Height->addItem(QString::number(i));
     }
     ui->Height->setCurrentText("170");
     ui->Height->setEditable(true);
-
-    // 初始化体重下拉框（单位：kg）
     for (int i = 30; i <= 150; i++) {
         ui->Weigh->addItem(QString::number(i));
     }
     ui->Weigh->setCurrentText("65");
     ui->Weigh->setEditable(true);
-
-    // 连接按钮信号
     connect(ui->save, &QPushButton::clicked, this, &PatientEditView::on_save_clicked);
     connect(ui->cancel, &QPushButton::clicked, this, &PatientEditView::on_cancel_clicked);
 }
@@ -74,16 +65,11 @@ void PatientEditView::loadPatientData()
     }
 
     QSqlTableModel *model = IDatabase::getInstance().patientTabModel;
-
-    // 查找患者
     for (int i = 0; i < model->rowCount(); i++) {
         if (model->data(model->index(i, 0)).toString() == currentPatientId) {
-            // 创建数据映射
             mapper = new QDataWidgetMapper(this);
             mapper->setModel(model);
             mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
-
-            // 根据数据库字段映射
             mapper->addMapping(ui->ID, 0);              // ID
             mapper->addMapping(ui->shenfenzheng, 1);   // ID_CARD
             mapper->addMapping(ui->Name, 2);           // NAME
@@ -132,12 +118,9 @@ void PatientEditView::savePatientData()
     QString patientId = ui->ID->text().trimmed();
 
     if (editMode && mapper) {
-        // 编辑模式
         if (mapper->submit()) {
             if (IDatabase::getInstance().submitPatientEdit()) {
                 QMessageBox::information(this, "成功", "患者信息已更新");
-
-                // 记录详细操作
                 IDatabase::getInstance().addOperationRecord(
                     "修改患者信息",
                     QString("患者：%1 (ID:%2)").arg(patientName).arg(patientId)
@@ -150,11 +133,8 @@ void PatientEditView::savePatientData()
             }
         }
     } else {
-        // 添加模式
         int row = IDatabase::getInstance().addNewPatient();
         QSqlTableModel *model = IDatabase::getInstance().patientTabModel;
-
-        // 使用正确的字段名
         model->setData(model->index(row, 2), ui->Name->text().trimmed());      // NAME
         model->setData(model->index(row, 1), ui->shenfenzheng->text().trimmed()); // ID_CARD
         model->setData(model->index(row, 3), ui->sex->currentText());          // SEX
@@ -166,10 +146,8 @@ void PatientEditView::savePatientData()
         if (IDatabase::getInstance().submitPatientEdit()) {
             QMessageBox::information(this, "成功", "患者信息已添加");
 
-            // 获取新添加的患者ID
             QString newPatientId = model->data(model->index(row, 0)).toString();
 
-            // 记录详细操作
             IDatabase::getInstance().addOperationRecord(
                 "添加新患者",
                 QString("患者：%1 (ID:%2)").arg(patientName).arg(newPatientId)
