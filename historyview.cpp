@@ -105,6 +105,7 @@ void HistoryView::on_btExport_clicked()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "错误", "无法创建文件");
+
         return;
     }
 
