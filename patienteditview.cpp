@@ -128,11 +128,21 @@ void PatientEditView::savePatientData()
         return;
     }
 
+    QString patientName = ui->Name->text().trimmed();
+    QString patientId = ui->ID->text().trimmed();
+
     if (editMode && mapper) {
         // 编辑模式
         if (mapper->submit()) {
             if (IDatabase::getInstance().submitPatientEdit()) {
                 QMessageBox::information(this, "成功", "患者信息已更新");
+
+                // 记录详细操作
+                IDatabase::getInstance().addOperationRecord(
+                    "修改患者信息",
+                    QString("患者：%1 (ID:%2)").arg(patientName).arg(patientId)
+                    );
+
                 emit editFinished();
             } else {
                 QMessageBox::warning(this, "错误", "更新失败: " +
@@ -155,6 +165,16 @@ void PatientEditView::savePatientData()
 
         if (IDatabase::getInstance().submitPatientEdit()) {
             QMessageBox::information(this, "成功", "患者信息已添加");
+
+            // 获取新添加的患者ID
+            QString newPatientId = model->data(model->index(row, 0)).toString();
+
+            // 记录详细操作
+            IDatabase::getInstance().addOperationRecord(
+                "添加新患者",
+                QString("患者：%1 (ID:%2)").arg(patientName).arg(newPatientId)
+                );
+
             emit editFinished();
         } else {
             QMessageBox::warning(this, "错误", "保存失败: " + model->lastError().text());

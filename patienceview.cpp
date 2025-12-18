@@ -13,12 +13,19 @@ PatienceView::PatienceView(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("患者管理");
     initModel();
+
+    // 连接按钮信号
     connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
+    connect(ui->btHistory, &QPushButton::clicked, this, &PatienceView::on_btHistory_clicked);
 }
 
 PatienceView::~PatienceView()
 {
     delete ui;
+}
+void PatienceView::on_btHistory_clicked()
+{
+    emit showHistoryRequested();
 }
 
 void PatienceView::initModel()
@@ -150,6 +157,7 @@ void PatienceView::on_btClear_clicked()
 
 void PatienceView::on_btAdd_clicked()
 {
+    IDatabase::getInstance().addOperationRecord("开始添加患者");
     emit addPatientRequested();
 }
 
@@ -163,10 +171,12 @@ void PatienceView::on_btDelete_clicked()
 
     int row = currentIndex.row();
     QString patientName = model->data(model->index(row, 2)).toString(); // NAME在第2列
+    QString patientId = model->data(model->index(row, 0)).toString();   // ID在第0列
+    QString patientCard = model->data(model->index(row, 1)).toString(); // 身份证号
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "确认删除",
-                                  QString("确定要删除患者 '%1' 吗？").arg(patientName),
+                                  QString("确定要删除患者 '%1' 吗？\n身份证：%2").arg(patientName).arg(patientCard),
                                   QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {

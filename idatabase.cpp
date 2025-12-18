@@ -1,20 +1,24 @@
 #include "idatabase.h"
 #include <QUuid>
 #include <QDebug>
+#include <QDateTime>
 
 QString IDatabase::userLogin(QString userName, QString password)
 {
     QSqlQuery query;
-    query.prepare("SELECT USERNAME, PASSWORD FROM user WHERE USERNAME = :USER");
+    query.prepare("SELECT USERNAME, PASSWORD, FULLNAME FROM user WHERE USERNAME = :USER");
     query.bindValue(":USER", userName);
     query.exec();
 
     if(query.first() && query.value("USERNAME").isValid()){
         QString passwd = query.value("PASSWORD").toString();
+        QString fullName = query.value("FULLNAME").toString();
         qDebug() << "Database password:" << passwd;
         qDebug() << "Input password:" << password;
 
         if(passwd == password){
+            currentUserName = fullName.isEmpty() ? userName : fullName; // 保存当前用户信息
+            qDebug() << "Current user set to:" << currentUserName;
             return "loginOk";
         } else {
             return "wrongPassword";
@@ -23,6 +27,76 @@ QString IDatabase::userLogin(QString userName, QString password)
         qDebug() << "No such user:" << userName;
         return "wrongUsername";
     }
+}
+QString IDatabase::getCurrentUserName()
+{
+    return currentUserName;
+}
+bool IDatabase::initHistoryModel()
+{
+    historyTabModel = new QSqlTableModel(this, database);
+    historyTabModel->setTable("History");
+    historyTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+    // 设置字段显示名称
+    historyTabModel->setHeaderData(0, Qt::Horizontal, "记录ID");
+    historyTabModel->setHeaderData(1, Qt::Horizontal, "操作用户");
+    historyTabModel->setHeaderData(2, Qt::Horizontal, "操作事件");
+    historyTabModel->setHeaderData(3, Qt::Horizontal, "操作时间");
+
+    // 按时间倒序排列（最新的在前）
+    historyTabModel->setSort(3, Qt::DescendingOrder);
+
+    if(!(historyTabModel->select())){
+        qDebug() << "Failed to select from History table:" << historyTabModel->lastError().text();
+        return false;
+    }
+
+    return true;
+}
+bool IDatabase::addOperationRecord(const QString &event, const QString &details)
+{
+    QSqlQuery query;
+
+    // 生成完整的操作记录
+    QString fullEvent = event;
+    if (!details.isEmpty()) {
+        fullEvent += "：" + details;
+    }
+
+    query.prepare("INSERT INTO History (ID, USER_ID, EVENT, TIMESTAMP) "
+                  "VALUES (:id, :user_id, :event, :timestamp)");
+
+    query.bindValue(":id", QUuid::createUuid().toString(QUuid::WithoutBraces));
+    query.bindValue(":user_id", currentUserName);
+    query.bindValue(":event", fullEvent);
+    query.bindValue(":timestamp", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+
+    if (query.exec()) {
+        qDebug() << "Operation record added:" << fullEvent;
+        return true;
+    } else {
+        qDebug() << "Failed to add operation record:" << query.lastError().text();
+        return false;
+    }
+}
+bool IDatabase::searchOperationRecord(const QString &filter)
+{
+    if (filter.isEmpty()) {
+        historyTabModel->setFilter("");
+    } else {
+        QString condition = QString("EVENT LIKE '%%1%' OR USER_ID LIKE '%%1%'").arg(filter);
+        historyTabModel->setFilter(condition);
+    }
+
+    bool result = historyTabModel->select();
+    qDebug() << "History search result:" << result << ", rows found:" << historyTabModel->rowCount();
+    return result;
+}
+
+QSqlTableModel *IDatabase::getHistoryModel()
+{
+    return historyTabModel;
 }
 
 void IDatabase::initDatabase()
@@ -82,8 +156,15 @@ int IDatabase::addNewPatient()
     int curRecNo = curIndex.row();
     QSqlRecord curRec = patientTabModel->record(curRecNo);
     curRec.setValue("CREATEDTIMESTAMP", QDateTime::currentDateTime().toString("yyyy-MM-dd"));
-    curRec.setValue("ID", QUuid::createUuid().toString(QUuid::WithoutBraces));
+
+    // 生成新ID
+    QString newId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    curRec.setValue("ID", newId);
+
     patientTabModel->setRecord(curRecNo, curRec);
+
+    // 记录操作
+    addOperationRecord("创建新患者", QString("新患者(ID:%1)").arg(newId));
 
     return curIndex.row();
 }
@@ -110,9 +191,19 @@ bool IDatabase::deleteCurrentPatient()
 {
     QModelIndex curIndex = thePatientSelection->currentIndex();
     if(curIndex.isValid()){
+        // 获取要删除的患者信息用于记录
+        QString patientName = patientTabModel->data(patientTabModel->index(curIndex.row(), 2)).toString();
+        QString patientId = patientTabModel->data(patientTabModel->index(curIndex.row(), 0)).toString();
+
         patientTabModel->removeRow(curIndex.row());
         bool success = patientTabModel->submitAll();
         patientTabModel->select();
+
+        // 记录操作
+        if (success) {
+            addOperationRecord("删除患者", QString("%1(ID:%2)").arg(patientName).arg(patientId));
+        }
+
         return success;
     }
     return false;
@@ -120,9 +211,18 @@ bool IDatabase::deleteCurrentPatient()
 
 bool IDatabase::submitPatientEdit()
 {
-    return patientTabModel->submitAll();
+    bool success = patientTabModel->submitAll();
+    if (success) {
+        // 获取最近修改的记录（假设最后一行是刚修改的）
+        int row = patientTabModel->rowCount() - 1;
+        if (row >= 0) {
+            QString patientName = patientTabModel->data(patientTabModel->index(row, 2)).toString();
+            QString patientId = patientTabModel->data(patientTabModel->index(row, 0)).toString();
+            addOperationRecord("保存患者信息", QString("%1(ID:%2)").arg(patientName).arg(patientId));
+        }
+    }
+    return success;
 }
-
 void IDatabase::revertPatientEdit()
 {
     patientTabModel->revertAll();

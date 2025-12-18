@@ -6,6 +6,7 @@
 MasterView::MasterView(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MasterView)
+    , historyView(nullptr)
 {
     ui->setupUi(this);
 
@@ -77,6 +78,15 @@ void MasterView::goPatientView()
     connect(patienceView, &PatienceView::editPatientRequested, this, [this](const QString &patientId) {
         goPatientEditView(patientId);
     });
+
+    // 连接操作记录查看信号
+    connect(patienceView, &PatienceView::showHistoryRequested, this, &MasterView::goHistoryView);
+}
+void MasterView::goHistoryView()
+{
+    qDebug() << "goHistoryView";
+    historyView = new HistoryView(this);
+    pushWidgetToStackView(historyView);
 }
 
 void MasterView::goPreviousView()

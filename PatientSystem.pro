@@ -1,6 +1,5 @@
 QT       += core gui sql
 
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -18,7 +17,8 @@ SOURCES += \
     masterview.cpp \
     patienceview.cpp \
     patienteditview.cpp \
-    welcomeview.cpp
+    welcomeview.cpp \
+    historyview.cpp
 
 HEADERS += \
     departmentview.h \
@@ -28,7 +28,8 @@ HEADERS += \
     masterview.h \
     patienceview.h \
     patienteditview.h \
-    welcomeview.h
+    welcomeview.h \
+    historyview.h
 
 FORMS += \
     departmentview.ui \
@@ -37,7 +38,8 @@ FORMS += \
     masterview.ui \
     patienceview.ui \
     patienteditview.ui \
-    welcomeview.ui
+    welcomeview.ui \
+    historyview.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
