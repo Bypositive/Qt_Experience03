@@ -16,10 +16,15 @@ PatienceView::PatienceView(QWidget *parent)
 
     // 连接按钮信号
     connect(ui->btSearch, &QPushButton::clicked, this, &PatienceView::on_btSearch_clicked);
+    connect(ui->btClear, &QPushButton::clicked, this, &PatienceView::on_btClear_clicked);
     connect(ui->btAdd, &QPushButton::clicked, this, &PatienceView::on_btAdd_clicked);
     connect(ui->btDelete, &QPushButton::clicked, this, &PatienceView::on_btDelete_clicked);
     connect(ui->btEdit, &QPushButton::clicked, this, &PatienceView::on_btEdit_clicked);
     connect(ui->tableView, &QTableView::doubleClicked, this, &PatienceView::on_tableView_doubleClicked);
+    connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
+
+    // 按Enter键搜索
+    connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
 }
 
 PatienceView::~PatienceView()
@@ -63,13 +68,70 @@ void PatienceView::updateTableView()
 void PatienceView::on_btSearch_clicked()
 {
     QString filter = ui->txtSearch->text().trimmed();
-    if (!filter.isEmpty()) {
-        QString condition = QString("NAME LIKE '%%1%' OR ID_CARD LIKE '%%1%' OR MOBILEPHONE LIKE '%%1%'")
-        .arg(filter);
-        IDatabase::getInstance().searchPatient(condition);
-    } else {
+
+    if (filter.isEmpty()) {
+        // 清除搜索，显示所有患者
         IDatabase::getInstance().searchPatient("");
+        updateTableView();
+        ui->tableView->clearSelection();
+        return;
     }
+
+    // 检查输入内容类型，提供更精确的搜索
+    QString condition;
+
+    // 如果是纯数字，可能是身份证号或手机号
+    bool isNumber;
+    filter.toLongLong(&isNumber);
+
+    if (isNumber) {
+        // 纯数字：检查是身份证号(18位)还是手机号(11位)
+        if (filter.length() == 18) {
+            // 身份证号
+            condition = QString("ID_CARD LIKE '%1%'").arg(filter);
+        } else if (filter.length() == 11) {
+            // 手机号
+            condition = QString("MOBILEPHONE LIKE '%1%'").arg(filter);
+        } else {
+            // 其他数字，在所有数字字段中查找
+            condition = QString("ID_CARD LIKE '%1%' OR MOBILEPHONE LIKE '%1%'")
+                            .arg(filter);
+        }
+    } else {
+        // 包含非数字，主要是姓名
+        condition = QString("NAME LIKE '%%1%'").arg(filter);
+    }
+
+    qDebug() << "Search condition:" << condition;
+
+    if (IDatabase::getInstance().searchPatient(condition)) {
+        int rowCount = model->rowCount();
+        if (rowCount == 0) {
+            QMessageBox::information(this, "查找结果", "未找到匹配的患者");
+        } else {
+            QMessageBox::information(this, "查找结果",
+                                     QString("找到 %1 条匹配记录").arg(rowCount));
+
+            // 选中第一条记录
+            if (rowCount > 0) {
+                ui->tableView->selectRow(0);
+            }
+        }
+    } else {
+        QMessageBox::warning(this, "查找错误", "搜索失败");
+    }
+}
+void PatienceView::on_btClear_clicked()
+{
+    // 清除搜索框
+    ui->txtSearch->clear();
+
+    // 显示所有患者
+    IDatabase::getInstance().searchPatient("");
+    updateTableView();
+
+    // 清除选择
+    ui->tableView->clearSelection();
 }
 
 void PatienceView::on_btAdd_clicked()

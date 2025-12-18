@@ -25,6 +25,7 @@ private slots:
     void on_btSearch_clicked();
     void on_btAdd_clicked();
     void on_btDelete_clicked();
+    void on_btClear_clicked();
     void on_btEdit_clicked();
     void on_tableView_doubleClicked(const QModelIndex &index);
 

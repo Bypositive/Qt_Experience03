@@ -15,9 +15,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLineEdit" name="txtSearch"/>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>请输入姓名、身份证号或手机号</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btSearch">
@@ -26,6 +33,17 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btClear">
+       <property name="text">
+        <string>清除</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btAdd">
        <property name="text">
