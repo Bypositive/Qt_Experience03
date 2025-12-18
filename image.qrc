@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../../图标资源/滑稽爷.png</file>
+    </qresource>
+</RCC>
