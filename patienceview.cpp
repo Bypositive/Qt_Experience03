@@ -69,57 +69,82 @@ void PatienceView::on_btSearch_clicked()
 {
     QString filter = ui->txtSearch->text().trimmed();
 
+    qDebug() << "=== 搜索开始 ===";
+    qDebug() << "搜索关键词:" << filter;
+
     if (filter.isEmpty()) {
-        // 清除搜索，显示所有患者
-        IDatabase::getInstance().searchPatient("");
-        updateTableView();
-        ui->tableView->clearSelection();
+        // 如果搜索框为空，显示所有患者
+        if (IDatabase::getInstance().searchPatient("")) {
+            updateTableView();
+        }
         return;
     }
 
-    // 检查输入内容类型，提供更精确的搜索
+    // 判断搜索类型并构建正确的SQL条件
     QString condition;
 
-    // 如果是纯数字，可能是身份证号或手机号
+    // 检查是否是纯数字
     bool isNumber;
     filter.toLongLong(&isNumber);
 
-    if (isNumber) {
-        // 纯数字：检查是身份证号(18位)还是手机号(11位)
-        if (filter.length() == 18) {
-            // 身份证号
-            condition = QString("ID_CARD LIKE '%1%'").arg(filter);
-        } else if (filter.length() == 11) {
-            // 手机号
-            condition = QString("MOBILEPHONE LIKE '%1%'").arg(filter);
-        } else {
-            // 其他数字，在所有数字字段中查找
-            condition = QString("ID_CARD LIKE '%1%' OR MOBILEPHONE LIKE '%1%'")
-                            .arg(filter);
-        }
+    if (isNumber && filter.length() == 18) {
+        // 身份证号
+        condition = QString("ID_CARD LIKE '%%1%'").arg(filter);
+    } else if (isNumber && filter.length() == 11) {
+        // 手机号
+        condition = QString("MOBILEPHONE LIKE '%%1%'").arg(filter);
+    } else if (isNumber) {
+        // 其他数字，搜索身份证和手机号
+        condition = QString("ID_CARD LIKE '%%1%' OR MOBILEPHONE LIKE '%%1%'").arg(filter);
     } else {
-        // 包含非数字，主要是姓名
+        // 中文姓名
         condition = QString("NAME LIKE '%%1%'").arg(filter);
     }
 
-    qDebug() << "Search condition:" << condition;
+    qDebug() << "构建的搜索条件:" << condition;
 
+    // 直接SQL查询测试
+    QSqlQuery testQuery;
+    QString testSql = QString("SELECT COUNT(*) as count FROM Patient WHERE %1").arg(condition);
+    qDebug() << "测试SQL:" << testSql;
+
+    if (testQuery.exec(testSql) && testQuery.next()) {
+        int count = testQuery.value("count").toInt();
+        qDebug() << "直接SQL查询找到" << count << "条记录";
+
+        if (count > 0) {
+            testQuery.exec(QString("SELECT NAME, ID_CARD, MOBILEPHONE FROM Patient WHERE %1").arg(condition));
+            while (testQuery.next()) {
+                qDebug() << "找到: 姓名=" << testQuery.value("NAME").toString()
+                    << ", 身份证=" << testQuery.value("ID_CARD").toString()
+                    << ", 手机=" << testQuery.value("MOBILEPHONE").toString();
+            }
+        }
+    }
+
+    // 使用QSqlTableModel进行搜索
     if (IDatabase::getInstance().searchPatient(condition)) {
         int rowCount = model->rowCount();
-        if (rowCount == 0) {
-            QMessageBox::information(this, "查找结果", "未找到匹配的患者");
-        } else {
-            QMessageBox::information(this, "查找结果",
+        qDebug() << "QSqlTableModel找到" << rowCount << "条记录";
+
+        if (rowCount > 0) {
+            QMessageBox::information(this, "查找成功",
                                      QString("找到 %1 条匹配记录").arg(rowCount));
 
-            // 选中第一条记录
+            // 自动选中第一行
             if (rowCount > 0) {
                 ui->tableView->selectRow(0);
             }
+        } else {
+            QMessageBox::information(this, "查找结果",
+                                     QString("未找到与 '%1' 匹配的患者").arg(filter));
         }
     } else {
-        QMessageBox::warning(this, "查找错误", "搜索失败");
+        QMessageBox::warning(this, "查找错误",
+                             "搜索失败，请检查数据库连接");
     }
+
+    qDebug() << "=== 搜索结束 ===";
 }
 void PatienceView::on_btClear_clicked()
 {
