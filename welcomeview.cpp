@@ -8,10 +8,36 @@ WelcomeView::WelcomeView(QWidget *parent)
 {
     qDebug()<<"create WelcomeView";
     ui->setupUi(this);
+
+    // 设置窗口标题
+    setWindowTitle("欢迎登录无极哥诊断系统");
+
+    // 连接按钮信号
+    connect(ui->department, &QPushButton::clicked, this, &WelcomeView::on_btDepartment_clicked);
+    connect(ui->doctor, &QPushButton::clicked, this, &WelcomeView::on_btDoctor_clicked);
+    connect(ui->patience, &QPushButton::clicked, this, &WelcomeView::on_btPatience_clicked);
 }
 
 WelcomeView::~WelcomeView()
 {
     qDebug()<<"destroy WelcomeView";
     delete ui;
+}
+
+void WelcomeView::on_btDepartment_clicked()
+{
+    qDebug() << "Department button clicked";
+    emit departmentClicked();
+}
+
+void WelcomeView::on_btDoctor_clicked()
+{
+    qDebug() << "Doctor button clicked";
+    emit doctorClicked();
+}
+
+void WelcomeView::on_btPatience_clicked()
+{
+    qDebug() << "Patience button clicked";
+    emit patienceClicked();
 }

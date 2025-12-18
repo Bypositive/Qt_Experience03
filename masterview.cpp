@@ -30,8 +30,12 @@ void MasterView::goLoginView()
 void MasterView::goWelcomeView()
 {
     qDebug()<<"goWelcomeView";
-    welcomeView =new WelcomeView(this);
+    welcomeView = new WelcomeView(this);
     pushWidgetToStackView(welcomeView);
+
+    connect(welcomeView, &WelcomeView::departmentClicked, this, &MasterView::goDepartmentView);
+    connect(welcomeView, &WelcomeView::doctorClicked, this, &MasterView::goDoctorView);
+    connect(welcomeView, &WelcomeView::patienceClicked, this, &MasterView::goPatientView);
 }
 
 void MasterView::goDoctorView()
