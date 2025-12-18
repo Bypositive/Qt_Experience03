@@ -24,13 +24,20 @@ void DepartmentView::initModel()
 {
     if (IDatabase::getInstance().initDepartmentModel()) {
         model = IDatabase::getInstance().departmentTabModel;
+
+        model->setSort(0, Qt::AscendingOrder);
+        model->select();
+
         ui->tableView->setModel(model);
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-        // 调整列宽
-        ui->tableView->setColumnWidth(0, 200);   // 科室ID
-        ui->tableView->setColumnWidth(1, 250);   // 科室名称
+        for (int i = 0; i < model->columnCount(); ++i) {
+            ui->tableView->setColumnHidden(i, false);
+        }
+
+        ui->tableView->setColumnWidth(0, 200);
+        ui->tableView->setColumnWidth(1, 250);
     } else {
         QMessageBox::warning(this, "错误", "无法初始化科室数据模型");
     }
@@ -39,6 +46,7 @@ void DepartmentView::initModel()
 void DepartmentView::updateTableView()
 {
     if (model) {
+        model->setSort(0, Qt::AscendingOrder);
         model->select();
     }
 }
@@ -77,14 +85,42 @@ void DepartmentView::on_btClear_clicked()
 
 void DepartmentView::on_btAdd_clicked()
 {
-    bool ok;
+    // 获取科室ID
+    bool okId;
+    QString departmentId = QInputDialog::getText(this, "添加科室",
+                                                 "请输入科室ID:",
+                                                 QLineEdit::Normal, "", &okId);
+
+    if (!okId || departmentId.trimmed().isEmpty()) {
+        return; // 用户取消或输入为空
+    }
+
+    // 检查ID是否已存在
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM Department WHERE ID = :id");
+    query.bindValue(":id", departmentId.trimmed());
+
+    if (query.exec() && query.next()) {
+        if (query.value(0).toInt() > 0) {
+            QMessageBox::warning(this, "错误",
+                                 QString("科室ID '%1' 已存在，请使用其他ID").arg(departmentId.trimmed()));
+            return;
+        }
+    } else {
+        QMessageBox::warning(this, "错误", "检查ID时发生错误");
+        return;
+    }
+
+    // 获取科室名称
+    bool okName;
     QString departmentName = QInputDialog::getText(this, "添加科室",
                                                    "请输入科室名称:",
-                                                   QLineEdit::Normal, "", &ok);
+                                                   QLineEdit::Normal, "", &okName);
 
-    if (ok && !departmentName.trimmed().isEmpty()) {
+    if (okName && !departmentName.trimmed().isEmpty()) {
         int row = IDatabase::getInstance().addNewDepartment();
-        model->setData(model->index(row, 1), departmentName.trimmed());
+        model->setData(model->index(row, 0), departmentId.trimmed());    // 设置ID到第0列
+        model->setData(model->index(row, 1), departmentName.trimmed());  // 设置名称到第1列
 
         if (IDatabase::getInstance().submitDepartmentEdit()) {
             QMessageBox::information(this, "成功", "科室已添加");
@@ -159,6 +195,7 @@ void DepartmentView::on_tableView_doubleClicked(const QModelIndex &index)
 }
 void DepartmentView::on_btStats_clicked()
 {
+    // 统计每个科室的医生数量
     QSqlQuery query;
     query.prepare("SELECT d.NAME as 科室名称, COUNT(doc.ID) as 医生数量 "
                   "FROM Department d "

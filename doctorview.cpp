@@ -24,12 +24,11 @@ void DoctorView::initModel()
 {
     if (IDatabase::getInstance().initDoctorModel()) {
         model = IDatabase::getInstance().doctorTabModel;
+        model->setSort(0, Qt::AscendingOrder);
+        model->select();
         ui->tableView->setModel(model);
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-        // 隐藏ID列
-        ui->tableView->setColumnHidden(0, true);
 
         // 调整列宽
         ui->tableView->setColumnWidth(1, 100);   // 工号
@@ -43,6 +42,7 @@ void DoctorView::initModel()
 void DoctorView::updateTableView()
 {
     if (model) {
+        model->setSort(0, Qt::AscendingOrder);
         model->select();
     }
 }
