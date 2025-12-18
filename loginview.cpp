@@ -9,12 +9,7 @@ LoginView::LoginView(QWidget *parent)
     , ui(new Ui::LoginView)
 {
     ui->setupUi(this);
-
-    // 设置密码输入框为密码模式
     ui->inputPassword->setEchoMode(QLineEdit::Password);
-
-    // 连接按钮信号
-    connect(ui->pushButton, &QPushButton::clicked, this, &LoginView::on_pushButton_clicked);
     connect(ui->btSignUp, &QPushButton::clicked, [this]() {
         QMessageBox::information(this, "注册", "请联系管理员注册账号");
     });

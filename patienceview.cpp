@@ -13,17 +13,6 @@ PatienceView::PatienceView(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("患者管理");
     initModel();
-
-    // 连接按钮信号
-    connect(ui->btSearch, &QPushButton::clicked, this, &PatienceView::on_btSearch_clicked);
-    connect(ui->btClear, &QPushButton::clicked, this, &PatienceView::on_btClear_clicked);
-    connect(ui->btAdd, &QPushButton::clicked, this, &PatienceView::on_btAdd_clicked);
-    connect(ui->btDelete, &QPushButton::clicked, this, &PatienceView::on_btDelete_clicked);
-    connect(ui->btEdit, &QPushButton::clicked, this, &PatienceView::on_btEdit_clicked);
-    connect(ui->tableView, &QTableView::doubleClicked, this, &PatienceView::on_tableView_doubleClicked);
-    connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
-
-    // 按Enter键搜索
     connect(ui->txtSearch, &QLineEdit::returnPressed, this, &PatienceView::on_btSearch_clicked);
 }
 
