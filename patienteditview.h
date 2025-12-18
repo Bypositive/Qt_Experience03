@@ -18,6 +18,9 @@ public:
 
     void setPatientData(const QString &patientId);
 
+signals:
+    void editFinished();
+
 private slots:
     void on_save_clicked();
     void on_cancel_clicked();

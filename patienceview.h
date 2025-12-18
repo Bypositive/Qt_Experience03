@@ -16,6 +16,11 @@ public:
     explicit PatienceView(QWidget *parent = nullptr);
     ~PatienceView();
 
+signals:
+    void addPatientRequested();
+    void editPatientRequested(const QString &patientId);
+    void goBack();
+
 private slots:
     void on_btSearch_clicked();
     void on_btAdd_clicked();

@@ -106,10 +106,14 @@ bool IDatabase::searchPatient(QString filter)
 
 bool IDatabase::deleteCurrentPatient()
 {
-    QModelIndex curIndex=thePatientSelection->currentIndex();
-    patientTabModel->removeRow(curIndex.row());
-    patientTabModel->submitAll();
-    patientTabModel->select();
+    QModelIndex curIndex = thePatientSelection->currentIndex();
+    if(curIndex.isValid()){
+        patientTabModel->removeRow(curIndex.row());
+        bool success = patientTabModel->submitAll();
+        patientTabModel->select();
+        return success;
+    }
+    return false;
 }
 
 bool IDatabase::submitPatientEdit()

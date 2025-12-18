@@ -11,7 +11,15 @@ PatienceView::PatienceView(QWidget *parent)
     , model(nullptr)
 {
     ui->setupUi(this);
+    setWindowTitle("患者管理");
     initModel();
+
+    // 连接按钮信号
+    connect(ui->btSearch, &QPushButton::clicked, this, &PatienceView::on_btSearch_clicked);
+    connect(ui->btAdd, &QPushButton::clicked, this, &PatienceView::on_btAdd_clicked);
+    connect(ui->btDelete, &QPushButton::clicked, this, &PatienceView::on_btDelete_clicked);
+    connect(ui->btEdit, &QPushButton::clicked, this, &PatienceView::on_btEdit_clicked);
+    connect(ui->tableView, &QTableView::doubleClicked, this, &PatienceView::on_tableView_doubleClicked);
 }
 
 PatienceView::~PatienceView()
@@ -27,7 +35,7 @@ void PatienceView::initModel()
         ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-        // 隐藏不需要的列（ID和AGE字段）
+        // 隐藏不需要的列
         ui->tableView->setColumnHidden(0, true);    // 隐藏ID列
         ui->tableView->setColumnHidden(8, true);    // 隐藏AGE列
         ui->tableView->setColumnHidden(9, true);    // 隐藏CREATEDTIMESTAMP列
@@ -56,7 +64,7 @@ void PatienceView::on_btSearch_clicked()
 {
     QString filter = ui->txtSearch->text().trimmed();
     if (!filter.isEmpty()) {
-        QString condition = QString("name LIKE '%%1%' OR idcard LIKE '%%1%' OR mobile LIKE '%%1%'")
+        QString condition = QString("NAME LIKE '%%1%' OR ID_CARD LIKE '%%1%' OR MOBILEPHONE LIKE '%%1%'")
         .arg(filter);
         IDatabase::getInstance().searchPatient(condition);
     } else {
@@ -66,8 +74,7 @@ void PatienceView::on_btSearch_clicked()
 
 void PatienceView::on_btAdd_clicked()
 {
-    // 切换到患者编辑视图
-
+    emit addPatientRequested();
 }
 
 void PatienceView::on_btDelete_clicked()
@@ -79,7 +86,7 @@ void PatienceView::on_btDelete_clicked()
     }
 
     int row = currentIndex.row();
-    QString patientName = model->data(model->index(row, 1)).toString();
+    QString patientName = model->data(model->index(row, 2)).toString(); // NAME在第2列
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "确认删除",
@@ -87,8 +94,12 @@ void PatienceView::on_btDelete_clicked()
                                   QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        IDatabase::getInstance().deleteCurrentPatient();
-        updateTableView();
+        if (IDatabase::getInstance().deleteCurrentPatient()) {
+            QMessageBox::information(this, "成功", "患者已删除");
+            updateTableView();
+        } else {
+            QMessageBox::warning(this, "错误", "删除失败");
+        }
     }
 }
 
@@ -100,15 +111,16 @@ void PatienceView::on_btEdit_clicked()
         return;
     }
 
-    // 切换到患者编辑视图，并传递当前选中的患者ID
     int row = currentIndex.row();
-    QString patientId = model->data(model->index(row, 0)).toString();
+    QString patientId = model->data(model->index(row, 0)).toString(); // ID在第0列
+    emit editPatientRequested(patientId);
 }
 
 void PatienceView::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-        QString patientId = model->data(model->index(index.row(), 0)).toString();
-
+        int row = index.row();
+        QString patientId = model->data(model->index(row, 0)).toString(); // ID在第0列
+        emit editPatientRequested(patientId);
     }
 }

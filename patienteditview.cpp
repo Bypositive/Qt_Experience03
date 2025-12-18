@@ -3,6 +3,7 @@
 #include "idatabase.h"
 #include <QMessageBox>
 #include <QDebug>
+#include <QDate>
 
 PatientEditView::PatientEditView(QWidget *parent, bool isEditMode, const QString &patientId)
     : QWidget(parent)
@@ -33,17 +34,26 @@ void PatientEditView::initUI()
     ui->sex->addItem("男");
     ui->sex->addItem("女");
 
+    // 初始化出生日期下拉框（默认当前日期）
+    QDate currentDate = QDate::currentDate();
+    for (int year = 1900; year <= currentDate.year(); year++) {
+        ui->birthday->addItem(QString::number(year) + "-01-01");
+    }
+    ui->birthday->setEditable(true); // 允许编辑
+
     // 初始化身高下拉框（单位：cm）
     for (int i = 140; i <= 220; i++) {
         ui->Height->addItem(QString::number(i));
     }
     ui->Height->setCurrentText("170");
+    ui->Height->setEditable(true);
 
     // 初始化体重下拉框（单位：kg）
     for (int i = 30; i <= 150; i++) {
         ui->Weigh->addItem(QString::number(i));
     }
     ui->Weigh->setCurrentText("65");
+    ui->Weigh->setEditable(true);
 
     // 连接按钮信号
     connect(ui->save, &QPushButton::clicked, this, &PatientEditView::on_save_clicked);
@@ -71,7 +81,7 @@ void PatientEditView::loadPatientData()
             // 创建数据映射
             mapper = new QDataWidgetMapper(this);
             mapper->setModel(model);
-            mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+            mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
 
             // 根据数据库字段映射
             mapper->addMapping(ui->ID, 0);              // ID
@@ -88,6 +98,7 @@ void PatientEditView::loadPatientData()
         }
     }
 }
+
 bool PatientEditView::validateInput()
 {
     if (ui->Name->text().trimmed().isEmpty()) {
@@ -119,11 +130,14 @@ void PatientEditView::savePatientData()
 
     if (editMode && mapper) {
         // 编辑模式
-        mapper->submit();
-        if (IDatabase::getInstance().submitPatientEdit()) {
-            QMessageBox::information(this, "成功", "患者信息已更新");
-        } else {
-            QMessageBox::warning(this, "错误", "更新失败");
+        if (mapper->submit()) {
+            if (IDatabase::getInstance().submitPatientEdit()) {
+                QMessageBox::information(this, "成功", "患者信息已更新");
+                emit editFinished();
+            } else {
+                QMessageBox::warning(this, "错误", "更新失败: " +
+                                                       IDatabase::getInstance().patientTabModel->lastError().text());
+            }
         }
     } else {
         // 添加模式
@@ -141,6 +155,7 @@ void PatientEditView::savePatientData()
 
         if (IDatabase::getInstance().submitPatientEdit()) {
             QMessageBox::information(this, "成功", "患者信息已添加");
+            emit editFinished();
         } else {
             QMessageBox::warning(this, "错误", "保存失败: " + model->lastError().text());
             IDatabase::getInstance().revertPatientEdit();
@@ -159,4 +174,5 @@ void PatientEditView::on_cancel_clicked()
         mapper->revert();
     }
     IDatabase::getInstance().revertPatientEdit();
+    emit editFinished();
 }
