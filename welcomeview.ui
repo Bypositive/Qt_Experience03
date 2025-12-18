@@ -13,13 +13,16 @@
   <property name="windowTitle">
    <string>欢迎登录无极哥诊断系统</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0">
-      <spacer name="horizontalSpacer_3">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -29,87 +32,9 @@
        </property>
       </spacer>
      </item>
-     <item row="2" column="0">
-      <spacer name="horizontalSpacer_7">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="3" column="0">
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1">
-        <widget class="QPushButton" name="department">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>科室管理</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="6">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="5">
-        <spacer name="horizontalSpacer_9">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="3">
-        <spacer name="horizontalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="4">
-        <widget class="QPushButton" name="doctor">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>医生管理</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
@@ -122,8 +47,8 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="7">
-        <widget class="QPushButton" name="patience">
+       <item>
+        <widget class="QPushButton" name="department">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -131,11 +56,11 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>患者管理</string>
+          <string>科室管理</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
+       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
@@ -148,7 +73,46 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="8">
+       <item>
+        <widget class="QPushButton" name="doctor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>医生管理</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="patience">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>患者管理</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_10">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
@@ -163,36 +127,13 @@
        </item>
       </layout>
      </item>
-     <item row="4" column="0">
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="5" column="0">
+     <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="1" column="0">
-      <spacer name="horizontalSpacer_11">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
