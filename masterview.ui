@@ -68,6 +68,19 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget"/>
    </item>
+   <item>
+    <widget class="QLabel" name="labelDeveloper">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>开发者：黄春林       学号：2023414300109</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
