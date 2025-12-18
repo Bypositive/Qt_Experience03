@@ -159,7 +159,6 @@ void DepartmentView::on_tableView_doubleClicked(const QModelIndex &index)
 }
 void DepartmentView::on_btStats_clicked()
 {
-    // 统计每个科室的医生数量
     QSqlQuery query;
     query.prepare("SELECT d.NAME as 科室名称, COUNT(doc.ID) as 医生数量 "
                   "FROM Department d "
