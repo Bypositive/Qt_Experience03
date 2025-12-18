@@ -20,6 +20,7 @@ signals:
     void goBack();
 
 private slots:
+    void on_btStats_clicked();
     void on_btSearch_clicked();
     void on_btClear_clicked();
     void on_btAdd_clicked();

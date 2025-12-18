@@ -157,3 +157,30 @@ void DepartmentView::on_tableView_doubleClicked(const QModelIndex &index)
         on_btEdit_clicked();
     }
 }
+void DepartmentView::on_btStats_clicked()
+{
+    // 统计每个科室的医生数量
+    QSqlQuery query;
+    query.prepare("SELECT d.NAME as 科室名称, COUNT(doc.ID) as 医生数量 "
+                  "FROM Department d "
+                  "LEFT JOIN Doctor doc ON d.ID = doc.DEPARTMENT_ID "
+                  "GROUP BY d.ID, d.NAME "
+                  "ORDER BY COUNT(doc.ID) DESC");
+
+    if (query.exec()) {
+        QString stats = "科室医生数量统计:\n\n";
+        int totalDoctors = 0;
+
+        while (query.next()) {
+            QString deptName = query.value("科室名称").toString();
+            int doctorCount = query.value("医生数量").toInt();
+            totalDoctors += doctorCount;
+            stats += QString("%1: %2 名医生\n").arg(deptName).arg(doctorCount);
+        }
+
+        stats += QString("\n总计: %1 名医生").arg(totalDoctors);
+        QMessageBox::information(this, "统计信息", stats);
+    } else {
+        QMessageBox::warning(this, "错误", "统计失败");
+    }
+}
