@@ -27,7 +27,27 @@ private:
 
     QSqlDatabase database;
 
+public:
+    // 医生管理
+    bool initDoctorModel();
+    int addNewDoctor();
+    bool searchDoctor(QString filter);
+    bool deleteCurrentDoctor();
+    bool submitDoctorEdit();
+    void revertDoctorEdit();
 
+    // 科室管理
+    bool initDepartmentModel();
+    int addNewDepartment();
+    bool searchDepartment(QString filter);
+    bool deleteCurrentDepartment();
+    bool submitDepartmentEdit();
+    void revertDepartmentEdit();
+
+    QSqlTableModel *doctorTabModel;
+    QSqlTableModel *departmentTabModel;
+    QItemSelectionModel *theDoctorSelection;
+    QItemSelectionModel *theDepartmentSelection;
 
 
 public:
