@@ -1,6 +1,7 @@
 #include "masterview.h"
 #include "ui_masterview.h"
 #include <QDebug>
+#include "idatabase.h"
 
 MasterView::MasterView(QWidget *parent)
     : QWidget(parent)
@@ -9,6 +10,7 @@ MasterView::MasterView(QWidget *parent)
     ui->setupUi(this);
 
     goLoginView();
+    IDatabase::getInstance();
 }
 
 MasterView::~MasterView()
@@ -21,6 +23,7 @@ void MasterView::goLoginView()
     qDebug()<<"goLoginView";
     loginView =new LoginView(this);
     pushWidgetToStackView(loginView);
+
     connect(loginView,SIGNAL(loginSuccess()),this,SLOT(goWelcomeView()));
 }
 
@@ -88,6 +91,28 @@ void MasterView::pushWidgetToStackView(QWidget *widget)
 void MasterView::on_btBack_clicked()
 {
     goPreviousView();
+}
 
+
+void MasterView::on_stackedWidget_currentChanged(int arg1)
+{
+    int count = ui->stackedWidget->count();
+    if(count>1)
+        ui->btBack->setEnabled(true);
+    else
+        ui->btBack->setEnabled(false);
+    QString title =ui->stackedWidget->currentWidget()->windowTitle();
+    if(title=="欢迎登录无极哥诊断系统"){
+        ui->btLogout->setEnabled(true);
+        ui->btBack->setEnabled(false);
+    }else{
+        ui->btLogout->setEnabled(false);
+    }
+}
+
+
+void MasterView::on_btLogout_clicked()
+{
+    goPreviousView();
 }
 
