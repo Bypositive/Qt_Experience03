@@ -11,7 +11,7 @@ LoginView::LoginView(QWidget *parent)
     ui->setupUi(this);
     ui->inputPassword->setEchoMode(QLineEdit::Password);
     connect(ui->btSignUp, &QPushButton::clicked, [this]() {
-        QMessageBox::information(this, "注册", "请联系管理员注册账号");
+        QMessageBox::information(this, "注册", "请联系管理员注册账号，管理员电话（13414585789）");
     });
 }
 
